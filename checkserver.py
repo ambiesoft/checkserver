@@ -1,3 +1,8 @@
+#
+# To install libralies...
+# >pip install playsound
+
+import os
 import tkinter as tk 
 from tkinter import messagebox 
 import urllib.request
@@ -33,7 +38,16 @@ def checkdb():
     if -1 == mystr.find('dbcheck is ok'):
         raise(IOError('db is not ok'))
 
+def playsoundcommon(ok):
+    from playsound import playsound
+    playsound(os.path.join(os.path.dirname(__file__), 'ok.wav' if ok else 'ng.wav'))
     
+def playoksound():
+    playsoundcommon(True)
+
+def playngsound():
+    playsoundcommon(False)
+
 def main():
     try:
         checkdns()
@@ -41,8 +55,11 @@ def main():
         checkblog()
         checkdb()
 
+        playoksound()
+
     except Exception as e:
         messagebox.showerror(APPNAME, repr(e)) #APPNAME, type(e).__name__ + (str)e)
+        playngsound()
 
 
 if __name__ == '__main__':

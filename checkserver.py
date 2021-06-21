@@ -6,6 +6,7 @@ import os
 import tkinter as tk 
 from tkinter import messagebox 
 import urllib.request
+import datetime
 
 APPNAME = 'checkserver'
 
@@ -49,6 +50,12 @@ def playngsound():
     playsoundcommon(False)
 
 def main():
+    logfilename = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        os.path.splitext(os.path.basename(__file__))[0] + '.log')
+    logfile = open(logfilename,'+w')
+    logfile.write(str(datetime.datetime.today()))
+
     try:
         checkdns()
         # messagebox.showinfo('title', 'message')
@@ -61,6 +68,7 @@ def main():
         messagebox.showerror(APPNAME, repr(e)) #APPNAME, type(e).__name__ + (str)e)
         playngsound()
 
+    logfile.close()
 
 if __name__ == '__main__':
     main()

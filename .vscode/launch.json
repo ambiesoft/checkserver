@@ -8,7 +8,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "pythonPath": "C:/local/python3/python.exe",
+            "python": "C:/local/python3/python.exe",
             "program": "${file}",
             "console": "integratedTerminal"
         }

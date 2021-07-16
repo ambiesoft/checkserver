@@ -1,6 +1,6 @@
 #
 # To install libralies...
-# >pip install playsound
+# >pip install
 
 import os
 import tkinter as tk 
@@ -9,20 +9,30 @@ import urllib.request
 import datetime
 import re
 import dns.resolver
+import inspect
+
+from lsPy import logger
 
 APPNAME = 'checkserver'
 
 root = tk.Tk() 
 # root.withdraw() #小さなウィンドウを表示させない 
 
+logging = None
+MYDOMAIN = 'ambiesoft.com'
+MYLOCALIP = '192.168.3.97'
+MYBLOGURL = "https://ambiesoft.com/blog/"
+
 def checkdns():
+    logging.write(inspect.currentframe().f_code.co_name)
     import socket
-    addr1 = socket.gethostbyname('ambiesoft.com') 
-    if addr1 != '192.168.3.97':
-        raise(NameError('not 192.168.3.97'))
+    addr1 = socket.gethostbyname(MYDOMAIN) 
+    if addr1 != MYLOCALIP:
+        raise(NameError('not ' + MYLOCALIP))
 
 def checkblog():
-    fp = urllib.request.urlopen("https://ambiesoft.com/blog/")
+    logging.write(inspect.currentframe().f_code.co_name)
+    fp = urllib.request.urlopen(MYBLOGURL)
     mybytes = fp.read()
     mystr = mybytes.decode("utf8")
     fp.close()
@@ -31,6 +41,7 @@ def checkblog():
         raise(IOError('not blog'))
 
 def checkdb():
+    logging.write(inspect.currentframe().f_code.co_name)
     fp = urllib.request.urlopen("https://ambiesoft.com/boolog/dbcheck")
     mybytes = fp.read()
     mystr = mybytes.decode("utf8")
@@ -40,6 +51,7 @@ def checkdb():
         raise(IOError('db is not ok'))
 
 def checkip():
+    logging.write(inspect.currentframe().f_code.co_name)
     fp = urllib.request.urlopen("http://checkip.dyndns.com/")
     ipstr = fp.read().decode("utf8")
     ip = re.findall( r'[0-9]+(?:\.[0-9]+){3}', ipstr )[0]
@@ -59,36 +71,29 @@ def checkip():
     if ip != dnsip:
         raise(NameError('Current ip != dns ip ({} != {}'.format(ip,dnsip)))
 
-def playsoundcommon(ok):
-    from playsound import playsound
-    playsound(os.path.join(os.path.dirname(__file__), 'ok.wav' if ok else 'ng.wav'))
+# def playsoundcommon(ok):
+#     from playsound import playsound
+#     playsound(os.path.join(os.path.dirname(__file__), 'ok.wav' if ok else 'ng.wav'))
     
-def playoksound():
-    playsoundcommon(True)
+# def playoksound():
+#     playsoundcommon(True)
 
-def playngsound():
-    playsoundcommon(False)
+# def playngsound():
+#     playsoundcommon(False)
 
 def main():
-    logfilename = os.path.join(
-        os.path.dirname(os.path.realpath(__file__)),
-        os.path.splitext(os.path.basename(__file__))[0] + '.log')
-    logfile = open(logfilename,'+w')
-    logfile.write(str(datetime.datetime.today()))
-
-    try:
-        checkdns()
-        checkblog()
-        checkdb()
-        checkip()
-        # playoksound()
-
-    except Exception as e:
-        messagebox.showerror(APPNAME, repr(e)) #APPNAME, type(e).__name__ + (str)e)
-        # playngsound()
-
-    logfile.close()
+    global logging
+    logging = logger.Logger()
+    logging.write('started')
+    checkdns()
+    checkblog()
+    checkdb()
+    checkip()
+    logging.write('ended')
+    del logging
 
 if __name__ == '__main__':
-    messagebox.showerror(APPNAME, 'aaaaaaaaaaaaaaaaaaa')
-    main()
+    try:    
+        main()
+    except Exception as e:
+        messagebox.showerror(APPNAME, repr(e)) #APPNAME, type(e).__name__ + (str)e)

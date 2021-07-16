@@ -62,8 +62,7 @@ def checkip():
 
     # 8.8.8.8 is Google's public DNS server
     my_resolver.nameservers = ['8.8.8.8']
-    # answers = my_resolver.query('ambiesoft.com', 'A')
-    answers = my_resolver.resolve('ambiesoft.com', 'A')
+    answers = my_resolver.resolve(MYDOMAIN, 'A')
     for answer in answers:
         dnsip = answer.to_text()
         break

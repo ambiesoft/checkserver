@@ -5,11 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "checkserver",
             "type": "python",
             "request": "launch",
             "python": "C:/local/python3/python.exe",
-            "program": "${file}",
+            "program": "checkserver.py",
             "console": "integratedTerminal"
         }
     ]

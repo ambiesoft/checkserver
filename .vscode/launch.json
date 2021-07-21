@@ -9,7 +9,15 @@
             "type": "python",
             "request": "launch",
             "python": "C:/local/python3/python.exe",
-            "program": "checkserver.py",
+            "program": "checkserver.pyw",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "playground",
+            "type": "python",
+            "request": "launch",
+            "python": "C:/local/python3/python.exe",
+            "program": "playground.py",
             "console": "integratedTerminal"
         }
     ]

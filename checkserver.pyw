@@ -6,6 +6,7 @@ import os
 import tkinter as tk 
 from tkinter import messagebox 
 import urllib.request
+import urllib.error
 import datetime
 import re
 import dns.resolver
@@ -94,5 +95,8 @@ def main():
 if __name__ == '__main__':
     try:    
         main()
+    except urllib.error.HTTPError as e:
+        messagebox.showerror(APPNAME, 
+            '{}, URL={}'.format(repr(e), e.filename))        
     except Exception as e:
-        messagebox.showerror(APPNAME, repr(e)) #APPNAME, type(e).__name__ + (str)e)
+        messagebox.showerror(APPNAME, repr(e) + type(e).__name__)

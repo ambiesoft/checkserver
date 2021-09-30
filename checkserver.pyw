@@ -11,6 +11,7 @@ import datetime
 import re
 import dns.resolver
 import inspect
+import certifi
 
 from lsPy import logger
 
@@ -25,6 +26,9 @@ MYLOCALIP = '192.168.3.97'
 MYBLOGURL = "https://ambiesoft.com/blog/"
 import config
 
+def openUrl(url):
+    return urllib.request.urlopen(url, cafile=certifi.where())
+
 def checkdns():
     logging.write(inspect.currentframe().f_code.co_name)
     import socket
@@ -34,7 +38,7 @@ def checkdns():
 
 def checkblog():
     logging.write(inspect.currentframe().f_code.co_name)
-    fp = urllib.request.urlopen(MYBLOGURL)
+    fp = openUrl(MYBLOGURL)
     mybytes = fp.read()
     mystr = mybytes.decode("utf8")
     fp.close()
@@ -44,7 +48,7 @@ def checkblog():
 
 def checkdb():
     logging.write(inspect.currentframe().f_code.co_name)
-    fp = urllib.request.urlopen("https://ambiesoft.com/boolog/dbcheck")
+    fp = openUrl("https://ambiesoft.com/boolog/dbcheck")
     mybytes = fp.read()
     mystr = mybytes.decode("utf8")
     fp.close()

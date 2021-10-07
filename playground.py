@@ -4,7 +4,8 @@ import urllib.request
 import urllib.error
 
 APPNAME = 'PLAYGROUND'
-MYBLOGURL = "https://ambiesoft.com/blog/aaaaaaaaaaaaaaaaaaaaaa"
+# MYBLOGURL = "https://ambiesoft.com/blog/"
+MYBLOGURL = "https://example.com/"
 
 def main():
     fp = urllib.request.urlopen(MYBLOGURL)

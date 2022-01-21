@@ -9,6 +9,7 @@ import urllib.request
 import urllib.error
 import datetime
 import re
+# pip install dnspython
 import dns.resolver
 import inspect
 import certifi
@@ -24,6 +25,9 @@ logging = None
 MYDOMAIN = 'ambiesoft.com'
 MYLOCALIP = '192.168.3.97'
 MYBLOGURL = "https://ambiesoft.com/blog/"
+MYMINERVAURL = "https://ambiesoft.com/minerva/archives/2066"
+
+# create 'config.py' from 'config.py.sample'
 import config
 
 def openUrl(url):
@@ -45,7 +49,21 @@ def checkblog():
 
     if -1 == mystr.find('ﾌﾞｰログ'):
         raise(IOError('not blog'))
+    if -1 == mystr.find('4755653727306095'):
+        raise(IOError('No Adsense'))
 
+def checkMinerva():
+    logging.write(inspect.currentframe().f_code.co_name)
+    fp = openUrl(MYMINERVAURL)
+    mybytes = fp.read()
+    mystr = mybytes.decode("utf8")
+    fp.close()
+
+    if -1 == mystr.find('偉大ブログ'):
+        raise(IOError('not blog'))
+    if -1 == mystr.find('4755653727306095'):
+        raise(IOError('No Adsense'))
+    
 def checkdb():
     logging.write(inspect.currentframe().f_code.co_name)
     fp = openUrl("https://ambiesoft.com/boolog/dbcheck")
@@ -123,6 +141,7 @@ def main():
     logging.write('started')
     checkdns()
     checkblog()
+    checkMinerva()
     checkdb()
     checkip()
     logging.write('ended')

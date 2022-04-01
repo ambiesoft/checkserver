@@ -2,9 +2,10 @@
 # To install libralies...
 # >pip install
 
+import config
 import os
-import tkinter as tk 
-from tkinter import messagebox 
+import tkinter as tk
+from tkinter import messagebox
 import urllib.request
 import urllib.error
 import datetime
@@ -18,8 +19,8 @@ from lsPy import logger
 
 APPNAME = 'checkserver'
 
-root = tk.Tk() 
-# root.withdraw() #小さなウィンドウを表示させない 
+root = tk.Tk()
+# root.withdraw() #小さなウィンドウを表示させない
 
 logging = None
 MYDOMAIN = 'ambiesoft.com'
@@ -28,42 +29,47 @@ MYBLOGURL = "https://ambiesoft.com/blog/"
 MYMINERVAURL = "https://ambiesoft.com/minerva/archives/2066"
 
 # create 'config.py' from 'config.py.sample'
-import config
+
+CHECKBLOGLIST = [
+    {
+        'name': 'blog',
+        'findstring': 'ﾌﾞｰログ',
+        'url': MYBLOGURL,
+    },
+    {
+        'name': 'minerva',
+        'findstring': '偉大ブログ',
+        'url': MYMINERVAURL,
+    },
+]
+
 
 def openUrl(url):
     return urllib.request.urlopen(url, cafile=certifi.where())
 
+
 def checkdns():
     logging.write(inspect.currentframe().f_code.co_name)
     import socket
-    addr1 = socket.gethostbyname(MYDOMAIN) 
+    addr1 = socket.gethostbyname(MYDOMAIN)
     if addr1 != MYLOCALIP:
         raise(NameError('not ' + MYLOCALIP))
 
+
 def checkblog():
-    logging.write(inspect.currentframe().f_code.co_name)
-    fp = openUrl(MYBLOGURL)
-    mybytes = fp.read()
-    mystr = mybytes.decode("utf8")
-    fp.close()
+    for blogitem in CHECKBLOGLIST:
+        logging.write(inspect.currentframe().f_code.co_name)
+        fp = openUrl(blogitem['url'])
+        mybytes = fp.read()
+        mystr = mybytes.decode("utf8")
+        fp.close()
 
-    if -1 == mystr.find('ﾌﾞｰログ'):
-        raise(IOError('not blog'))
-    if -1 == mystr.find('4755653727306095'):
-        raise(IOError('No Adsense'))
+        if -1 == mystr.find(blogitem['findstring']):
+            raise(IOError('not blog'))
+        if -1 == mystr.find('4755653727306095'):
+            raise(IOError('No Adsense in {}'.format(blogitem['name'])))
 
-def checkMinerva():
-    logging.write(inspect.currentframe().f_code.co_name)
-    fp = openUrl(MYMINERVAURL)
-    mybytes = fp.read()
-    mystr = mybytes.decode("utf8")
-    fp.close()
 
-    if -1 == mystr.find('偉大ブログ'):
-        raise(IOError('not blog'))
-    if -1 == mystr.find('4755653727306095'):
-        raise(IOError('No Adsense'))
-    
 def checkdb():
     logging.write(inspect.currentframe().f_code.co_name)
     fp = openUrl("https://ambiesoft.com/boolog/dbcheck")
@@ -73,6 +79,7 @@ def checkdb():
 
     if -1 == mystr.find('dbcheck is ok'):
         raise(IOError('db is not ok'))
+
 
 def getip2():
     # create a password manager
@@ -97,19 +104,21 @@ def getip2():
 
     fp = urllib.request.urlopen(top_level_url)
     allhtml = fp.read().decode("eucjp")
-    ip = re.findall( r'[0-9]+(?:\.[0-9]+){3}', allhtml )[0]
+    ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', allhtml)[0]
     if not ip:
         raise(IOError('current ip not found'))
     return ip
+
 
 def getip():
     logging.write(inspect.currentframe().f_code.co_name)
     fp = urllib.request.urlopen("http://checkip.dyndns.com/")
     ipstr = fp.read().decode("utf8")
-    ip = re.findall( r'[0-9]+(?:\.[0-9]+){3}', ipstr )[0]
+    ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', ipstr)[0]
     if not ip:
         raise(IOError('current ip not found'))
     return ip
+
 
 def checkip():
     ip = getip2()
@@ -123,17 +132,18 @@ def checkip():
         break
 
     if ip != dnsip:
-        raise(NameError('Current ip != dns ip ({} != {}'.format(ip,dnsip)))
+        raise(NameError('Current ip != dns ip ({} != {}'.format(ip, dnsip)))
 
 # def playsoundcommon(ok):
 #     from playsound import playsound
 #     playsound(os.path.join(os.path.dirname(__file__), 'ok.wav' if ok else 'ng.wav'))
-    
+
 # def playoksound():
 #     playsoundcommon(True)
 
 # def playngsound():
 #     playsoundcommon(False)
+
 
 def main():
     global logging
@@ -141,17 +151,17 @@ def main():
     logging.write('started')
     checkdns()
     checkblog()
-    checkMinerva()
     checkdb()
     checkip()
     logging.write('ended')
     del logging
 
+
 if __name__ == '__main__':
-    try:    
+    try:
         main()
     except urllib.error.HTTPError as e:
-        messagebox.showerror(APPNAME, 
-            '{}, URL={}'.format(repr(e), e.filename))        
+        messagebox.showerror(APPNAME,
+                             '{}, URL={}'.format(repr(e), e.filename))
     except Exception as e:
         messagebox.showerror(APPNAME, repr(e) + type(e).__name__)

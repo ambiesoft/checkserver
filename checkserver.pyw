@@ -27,6 +27,7 @@ MYDOMAIN = 'ambiesoft.com'
 MYLOCALIP = '192.168.3.97'
 MYBLOGURL = "https://ambiesoft.com/blog/"
 MYMINERVAURL = "https://ambiesoft.com/minerva/archives/2066"
+MYPYONURL = "https://ambiesoft.com/maruchi/pyon/archives/127"
 
 # create 'config.py' from 'config.py.sample'
 
@@ -40,6 +41,11 @@ CHECKBLOGLIST = [
         'name': 'minerva',
         'findstring': '偉大ブログ',
         'url': MYMINERVAURL,
+    },
+    {
+        'name': 'pyon',
+        'findstring': 'ぴょんぴょんブログ',
+        'url': MYPYONURL,
     },
 ]
 
@@ -56,7 +62,7 @@ def checkdns():
         raise(NameError('not ' + MYLOCALIP))
 
 
-def checkblog():
+def checkblogs():
     for blogitem in CHECKBLOGLIST:
         logging.write(inspect.currentframe().f_code.co_name)
         fp = openUrl(blogitem['url'])
@@ -150,7 +156,7 @@ def main():
     logging = logger.Logger()
     logging.write('started')
     checkdns()
-    checkblog()
+    checkblogs()
     checkdb()
     checkip()
     logging.write('ended')

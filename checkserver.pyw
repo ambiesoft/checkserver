@@ -73,7 +73,7 @@ def checkblogs():
         if -1 == mystr.find(blogitem['findstring']):
             raise(IOError('not blog'))
         if -1 == mystr.find('4755653727306095'):
-            raise(IOError('No Adsense in {}'.format(blogitem['name'])))
+            raise(IOError('No Adsense in {}. Add {} on the header.php'.format(blogitem['name'], '<script data-ad-client="ca-pub-4755653727306095" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>')))
 
 
 def checkdb():

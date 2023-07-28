@@ -127,6 +127,8 @@ def getip():
 
 
 def checkip():
+    logging.write(inspect.currentframe().f_code.co_name)
+    
     ip = getip2()
     my_resolver = dns.resolver.Resolver()
 

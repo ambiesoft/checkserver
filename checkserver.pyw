@@ -2,7 +2,9 @@
 # To install libralies...
 # >pip install
 
+# create 'config.py' from 'config.py.sample'
 import config
+
 import os
 import tkinter as tk
 from tkinter import messagebox
@@ -10,8 +12,10 @@ import urllib.request
 import urllib.error
 import datetime
 import re
+
 # pip install dnspython
 import dns.resolver
+
 import inspect
 import certifi
 
@@ -24,17 +28,15 @@ root = tk.Tk()
 
 logging = None
 MYDOMAIN = 'ambiesoft.com'
-MYLOCALIP = '192.168.3.97'
+MYSEARVER_LOCALIP = '192.168.3.97'
 MYBLOGURL = "https://ambiesoft.com/blog/"
 MYMINERVAURL = "https://ambiesoft.com/minerva/archives/2066"
 MYPYONURL = "https://ambiesoft.com/maruchi/pyon/archives/127"
 
-# create 'config.py' from 'config.py.sample'
-
 CHECKBLOGLIST = [
     {
         'name': 'blog',
-        'findstring': 'ﾌﾞｰログ',
+        'findstring': 'ブーログ',
         'url': MYBLOGURL,
     },
     {
@@ -49,18 +51,15 @@ CHECKBLOGLIST = [
     },
 ]
 
-
 def openUrl(url):
     return urllib.request.urlopen(url, cafile=certifi.where())
-
 
 def checkdns():
     logging.write(inspect.currentframe().f_code.co_name)
     import socket
     addr1 = socket.gethostbyname(MYDOMAIN)
-    if addr1 != MYLOCALIP:
-        raise(NameError('not ' + MYLOCALIP))
-
+    if addr1 != MYSEARVER_LOCALIP:
+        raise(NameError('not ' + MYSEARVER_LOCALIP))
 
 def checkblogs():
     for blogitem in CHECKBLOGLIST:
@@ -75,7 +74,6 @@ def checkblogs():
         if -1 == mystr.find('4755653727306095'):
             raise(IOError('No Adsense in {}. Add {} on the header.php'.format(blogitem['name'], '<script data-ad-client="ca-pub-4755653727306095" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>')))
 
-
 def checkdb():
     logging.write(inspect.currentframe().f_code.co_name)
     fp = openUrl("https://ambiesoft.com/boolog/dbcheck")
@@ -86,7 +84,21 @@ def checkdb():
     if -1 == mystr.find('dbcheck is ok'):
         raise(IOError('db is not ok'))
 
+def check_from_remote():
+    ''' open google translate of https://ambiesoft.com/remotecheck.txt and check whether
+    specified string is found '''
 
+    logging.write(inspect.currentframe().f_code.co_name)
+
+    SITE_HTML_STRING='32F79CE2-E088-497B-A6C9-9E906D54AE5F'
+
+    fp = openUrl('https://ambiesoft-com.translate.goog/remotecheck.txt?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja&_x_tr_pto=wapp')
+    mybytes = fp.read()
+    mystr = mybytes.decode('utf8')
+
+    if -1 == mystr.find(SITE_HTML_STRING):
+        raise(IOError('My site can not be accessed from outside.'))
+    
 def getip2():
     # create a password manager
     password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
@@ -115,7 +127,6 @@ def getip2():
         raise(IOError('current ip not found'))
     return ip
 
-
 def getip():
     logging.write(inspect.currentframe().f_code.co_name)
     fp = urllib.request.urlopen("http://checkip.dyndns.com/")
@@ -124,7 +135,6 @@ def getip():
     if not ip:
         raise(IOError('current ip not found'))
     return ip
-
 
 def checkip():
     logging.write(inspect.currentframe().f_code.co_name)
@@ -142,28 +152,23 @@ def checkip():
     if ip != dnsip:
         raise(NameError('Current ip != dns ip ({} != {}'.format(ip, dnsip)))
 
-# def playsoundcommon(ok):
-#     from playsound import playsound
-#     playsound(os.path.join(os.path.dirname(__file__), 'ok.wav' if ok else 'ng.wav'))
-
-# def playoksound():
-#     playsoundcommon(True)
-
-# def playngsound():
-#     playsoundcommon(False)
-
+def modifyAsSpecialLogLine(line):
+    ''' Add ---------- on the line '''
+    return f'---------- {line} ----------'
 
 def main():
     global logging
     logging = logger.Logger()
-    logging.write('started')
+    logging.write(modifyAsSpecialLogLine('started'))
+    
     checkdns()
     checkblogs()
     checkdb()
     checkip()
-    logging.write('ended')
-    del logging
+    check_from_remote()
 
+    logging.write(modifyAsSpecialLogLine('ended'))
+    del logging
 
 if __name__ == '__main__':
     try:

@@ -24,7 +24,7 @@ from lsPy import logger
 APPNAME = 'checkserver'
 
 root = tk.Tk()
-# root.withdraw() #小さなウィンドウを表示させない
+# root.withdraw() # Do not let a small window to show
 
 logging = None
 MYDOMAIN = 'ambiesoft.com'

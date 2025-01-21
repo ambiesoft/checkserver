@@ -51,38 +51,50 @@ CHECKBLOGLIST = [
     },
 ]
 
+
 def openUrl(url):
     return urllib.request.urlopen(url, cafile=certifi.where())
+
 
 def checkdns():
     logging.write(inspect.currentframe().f_code.co_name)
     import socket
     addr1 = socket.gethostbyname(MYDOMAIN)
     if addr1 != MYSEARVER_LOCALIP:
-        raise(NameError('not ' + MYSEARVER_LOCALIP))
+        raise (NameError('not ' + MYSEARVER_LOCALIP))
+    logging.write("{} is {}".format(MYDOMAIN, addr1))
+
 
 def checkblogs():
     for blogitem in CHECKBLOGLIST:
-        logging.write(inspect.currentframe().f_code.co_name)
+        logging.write("{} for {}".format(
+            inspect.currentframe().f_code.co_name, blogitem["name"]))
         fp = openUrl(blogitem['url'])
         mybytes = fp.read()
         mystr = mybytes.decode("utf8")
         fp.close()
 
         if -1 == mystr.find(blogitem['findstring']):
-            raise(IOError('not blog'))
+            raise (IOError('not blog'))
         if -1 == mystr.find('4755653727306095'):
-            raise(IOError('No Adsense in {}. Add {} on the header.php'.format(blogitem['name'], '<script data-ad-client="ca-pub-4755653727306095" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>')))
+            raise (IOError('No Adsense in {}. Add {} on the header.php'.format(
+                blogitem['name'], '<script data-ad-client="ca-pub-4755653727306095" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>')))
+
+
+DBCHECKURL = "https://ambiesoft.com/boolog/dbcheck"
+
 
 def checkdb():
     logging.write(inspect.currentframe().f_code.co_name)
-    fp = openUrl("https://ambiesoft.com/boolog/dbcheck")
+    fp = openUrl(DBCHECKURL)
     mybytes = fp.read()
     mystr = mybytes.decode("utf8")
     fp.close()
 
     if -1 == mystr.find('dbcheck is ok'):
-        raise(IOError('db is not ok'))
+        raise (IOError('db is not ok'))
+    logging.write("{} is OK".format(DBCHECKURL))
+
 
 def check_from_remote():
     ''' open google translate of https://ambiesoft.com/remotecheck.txt and check whether
@@ -90,15 +102,17 @@ def check_from_remote():
 
     logging.write(inspect.currentframe().f_code.co_name)
 
-    SITE_HTML_STRING='32F79CE2-E088-497B-A6C9-9E906D54AE5F'
+    SITE_HTML_STRING = '32F79CE2-E088-497B-A6C9-9E906D54AE5F'
 
-    fp = openUrl('https://ambiesoft-com.translate.goog/remotecheck.txt?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja&_x_tr_pto=wapp')
+    fp = openUrl(
+        'https://ambiesoft-com.translate.goog/remotecheck.txt?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja&_x_tr_pto=wapp')
     mybytes = fp.read()
     mystr = mybytes.decode('utf8')
 
     if -1 == mystr.find(SITE_HTML_STRING):
-        raise(IOError('My site can not be accessed from outside.'))
-    
+        raise (IOError('My site can not be accessed from outside.'))
+
+
 def getip2():
     # create a password manager
     password_mgr = urllib.request.HTTPPasswordMgrWithDefaultRealm()
@@ -124,8 +138,9 @@ def getip2():
     allhtml = fp.read().decode("eucjp")
     ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', allhtml)[0]
     if not ip:
-        raise(IOError('current ip not found'))
+        raise (IOError('current ip not found'))
     return ip
+
 
 def getip():
     logging.write(inspect.currentframe().f_code.co_name)
@@ -133,13 +148,16 @@ def getip():
     ipstr = fp.read().decode("utf8")
     ip = re.findall(r'[0-9]+(?:\.[0-9]+){3}', ipstr)[0]
     if not ip:
-        raise(IOError('current ip not found'))
+        raise (IOError('current ip not found'))
     return ip
+
 
 def checkip():
     logging.write(inspect.currentframe().f_code.co_name)
-    
+
     ip = getip2()
+    logging.write("Current IP is {}".format(ip))
+
     my_resolver = dns.resolver.Resolver()
 
     # 8.8.8.8 is Google's public DNS server
@@ -149,18 +167,22 @@ def checkip():
         dnsip = answer.to_text()
         break
 
+    logging.write("DNS(8.8.8.8) IP is {}".format(dnsip))
+
     if ip != dnsip:
-        raise(NameError('Current ip != dns ip ({} != {}'.format(ip, dnsip)))
+        raise (NameError('Current ip != dns ip ({} != {}'.format(ip, dnsip)))
+
 
 def modifyAsSpecialLogLine(line):
     ''' Add ---------- on the line '''
     return f'---------- {line} ----------'
 
+
 def main():
     global logging
     logging = logger.Logger()
     logging.write(modifyAsSpecialLogLine('started'))
-    
+
     checkdns()
     checkblogs()
     checkdb()
@@ -169,6 +191,7 @@ def main():
 
     logging.write(modifyAsSpecialLogLine('ended'))
     del logging
+
 
 if __name__ == '__main__':
     try:

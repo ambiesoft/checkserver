@@ -12,6 +12,7 @@ import urllib.request
 import urllib.error
 import datetime
 import re
+from datetime import datetime
 
 # pip install dnspython
 import dns.resolver
@@ -178,6 +179,11 @@ def modifyAsSpecialLogLine(line):
     return f'---------- {line} ----------'
 
 
+def errorEnd(message):
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    messagebox.showerror(APPNAME, f"{current_time}\n\n{message}")
+
+
 def main():
     global logging
     logging = logger.Logger()
@@ -197,7 +203,6 @@ if __name__ == '__main__':
     try:
         main()
     except urllib.error.HTTPError as e:
-        messagebox.showerror(APPNAME,
-                             '{}, URL={}'.format(repr(e), e.filename))
+        errorEnd('{}, URL={}'.format(repr(e), e.filename))
     except Exception as e:
-        messagebox.showerror(APPNAME, repr(e) + type(e).__name__)
+        errorEnd(repr(e) + type(e).__name__)

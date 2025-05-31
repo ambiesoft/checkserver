@@ -13,6 +13,7 @@ import urllib.error
 import datetime
 import re
 from datetime import datetime
+import random
 
 # pip install dnspython
 import dns.resolver
@@ -100,6 +101,11 @@ def checkdb():
 def check_from_remote():
     ''' open google translate of https://ambiesoft.com/remotecheck.txt and check whether
     specified string is found '''
+
+    # Google Translate emits <HTTPError 429: 'Too Many Requests'>
+    # Run one check every five times
+    if random.randint(1, 5) != 1:
+        return
 
     logging.write(inspect.currentframe().f_code.co_name)
 

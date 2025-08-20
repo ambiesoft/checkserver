@@ -14,6 +14,7 @@ import datetime
 import re
 from datetime import datetime
 import random
+import ssl
 
 # pip install dnspython
 import dns.resolver
@@ -180,6 +181,23 @@ def checkip():
         raise (NameError('Current ip != dns ip ({} != {}'.format(ip, dnsip)))
 
 
+def checktls():
+    logging.write(inspect.currentframe().f_code.co_name)
+
+    # Check TLS connection to the server
+    try:
+        context = ssl.create_default_context()
+        context.check_hostname = True
+        context.verify_mode = ssl.CERT_REQUIRED
+        context.load_verify_locations(cafile=certifi.where())
+
+        with urllib.request.urlopen("https://ambiesoft.com", context=context) as response:
+            logging.write(
+                "TLS connection successful, status code: {}".format(response.status))
+    except Exception as e:
+        raise (IOError('TLS connection failed: ' + str(e)))
+
+
 def modifyAsSpecialLogLine(line):
     ''' Add ---------- on the line '''
     return f'---------- {line} ----------'
@@ -195,6 +213,7 @@ def main():
     logging = logger.Logger()
     logging.write(modifyAsSpecialLogLine('started'))
 
+    checktls()
     checkdns()
     checkblogs()
     checkdb()
